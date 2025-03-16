@@ -19,11 +19,11 @@ jobs:
           python-version: "3.10"
 
       - name: 📦 Instalar dependências
-        run: pip install gspread pandas google-auth
+        run: pip install gspread pandas google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
 
       - name: 🕵️ Verificar se o segredo foi salvo corretamente
         run: |
-          if [[ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]]; then
+          if [ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]; then
             echo "❌ ERRO: O segredo GOOGLE_CREDENTIALS não foi definido!"
             exit 1
           else
@@ -35,8 +35,9 @@ jobs:
 
       - name: 🔑 Criar arquivo de credenciais
         run: |
-          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials/credentials.json
-          cat credentials/credentials.json  # Exibe o conteúdo para depuração
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > credentials/credentials.json
+          echo "🔍 Conteúdo das credenciais:"
+          cat credentials/credentials.json | head -n 5  # Exibe apenas as primeiras linhas para verificar sem expor dados
           ls -l credentials  # Lista os arquivos para verificar se foi criado
 
       - name: 🔍 Listar arquivos no repositório
@@ -44,6 +45,10 @@ jobs:
 
       - name: 📊 Rodar extração de dados
         run: |
+          if [ ! -f scripts/extract_sheets.py ]; then
+            echo "❌ ERRO: O script extract_sheets.py não foi encontrado!"
+            exit 1
+          fi
           cd scripts  # Entra na pasta correta, caso necessário
           ls -l  # Lista os arquivos dentro da pasta scripts para confirmar a existência do script
           python extract_sheets.py  # Executa o script
