@@ -29,8 +29,14 @@ jobs:
           echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials/credentials.json
           cat credentials/credentials.json  # Exibe o conteúdo para depuração
 
+      - name: 🔍 Listar arquivos no repositório
+        run: ls -R  # Lista recursivamente os arquivos para verificar o caminho correto
+
       - name: 📊 Rodar extração de dados
-        run: python scripts/extract_sheets.py
+        run: |
+          cd scripts  # Entra na pasta correta, caso necessário
+          ls -l  # Lista os arquivos dentro da pasta scripts para confirmar a existência do script
+          python extract_sheets.py  # Executa o script
 
       - name: 📤 Commit dos novos dados (se houver mudanças)
         run: |
