@@ -21,6 +21,15 @@ jobs:
       - name: 📦 Instalar dependências
         run: pip install gspread pandas google-auth
 
+      - name: 🕵️ Verificar se o segredo foi salvo corretamente
+        run: |
+          if [[ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]]; then
+            echo "❌ ERRO: O segredo GOOGLE_CREDENTIALS não foi definido!"
+            exit 1
+          else
+            echo "✅ O segredo GOOGLE_CREDENTIALS está definido corretamente!"
+          fi
+
       - name: 📁 Criar pasta credentials (caso não exista)
         run: mkdir -p credentials
 
