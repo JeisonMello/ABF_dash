@@ -26,7 +26,7 @@ jobs:
 
       - name: 🔑 Criar arquivo de credenciais
         run: echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials/credentials.json
-
+          
       - name: 📊 Rodar extração de dados
         run: python scripts/extract_sheets.py
 
