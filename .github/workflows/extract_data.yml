@@ -33,9 +33,10 @@ jobs:
       - name: 📁 Criar pasta credentials (caso não exista)
         run: mkdir -p credentials
 
-      - name: 🔑 Criar arquivo de credenciais
+      - name: 🔑 Criar arquivo de credenciais corretamente
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > credentials/credentials.json
+          printf "%s" "${{ secrets.GOOGLE_CREDENTIALS }}" > credentials/credentials.json
+          chmod 600 credentials/credentials.json  # Garante que o arquivo tenha permissão correta
           cat credentials/credentials.json  # Exibe o conteúdo para depuração
           ls -l credentials  # Lista os arquivos dentro da pasta para verificar se foi criado
 
