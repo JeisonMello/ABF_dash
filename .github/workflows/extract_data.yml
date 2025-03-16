@@ -36,9 +36,8 @@ jobs:
       - name: 🔑 Criar arquivo de credenciais
         run: |
           echo "${{ secrets.GOOGLE_CREDENTIALS }}" > credentials/credentials.json
-          echo "🔍 Conteúdo das credenciais:"
-          cat credentials/credentials.json | head -n 5  # Exibe apenas as primeiras linhas para verificar sem expor dados
-          ls -l credentials  # Lista os arquivos para verificar se foi criado
+          cat credentials/credentials.json  # Exibe o conteúdo para depuração
+          ls -l credentials  # Lista os arquivos dentro da pasta para verificar se foi criado
 
       - name: 🔍 Listar arquivos no repositório
         run: ls -R  # Lista recursivamente os arquivos para verificar o caminho correto
