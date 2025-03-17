@@ -19,7 +19,7 @@ jobs:
           python-version: "3.10"
 
       - name: 📦 Instalar dependências
-        run: pip install gspread pandas google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
+        run: pip install gspread pandas google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client jq
 
       - name: 🕵️ Verificar se o segredo foi salvo corretamente
         run: |
@@ -35,10 +35,17 @@ jobs:
 
       - name: 🔑 Criar arquivo de credenciais corretamente
         run: |
-          printf "%s" "${{ secrets.GOOGLE_CREDENTIALS }}" > credentials/credentials.json
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" | base64 --decode > credentials/credentials.json
           chmod 600 credentials/credentials.json  # Garante que o arquivo tenha permissão correta
-          cat credentials/credentials.json  # Exibe o conteúdo para depuração
-          ls -l credentials  # Lista os arquivos dentro da pasta para verificar se foi criado
+          
+          # Valida se o JSON está correto
+          if jq empty credentials/credentials.json; then
+            echo "✅ Arquivo credentials.json está válido!"
+          else
+            echo "❌ ERRO: O arquivo credentials.json está inválido!"
+            cat credentials/credentials.json
+            exit 1
+          fi
 
       - name: 🔍 Listar arquivos no repositório
         run: ls -R  # Lista recursivamente os arquivos para verificar o caminho correto
