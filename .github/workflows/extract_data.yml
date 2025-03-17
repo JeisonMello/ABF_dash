@@ -21,52 +21,58 @@ jobs:
       - name: 📦 Instalar dependências
         run: pip install gspread pandas google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client jq
 
-      - name: 🕵️ Verificar se o segredo foi salvo corretamente
+      - name: 🕵️ Verificar se o segredo GOOGLE_CREDENTIALS foi salvo corretamente
         run: |
           if [ -z "${{ secrets.GOOGLE_CREDENTIALS }}" ]; then
-            echo "❌ ERRO: O segredo GOOGLE_CREDENTIALS não foi definido!"
+            echo "❌ ERRO: O segredo GOOGLE_CREDENTIALS não foi definido no GitHub!"
             exit 1
           else
-            echo "✅ O segredo GOOGLE_CREDENTIALS está definido corretamente!"
+            echo "✅ O segredo GOOGLE_CREDENTIALS está definido corretamente."
           fi
 
       - name: 📁 Criar pasta credentials (caso não exista)
         run: mkdir -p credentials
 
-      - name: 🔑 Criar arquivo de credenciais corretamente
+      - name: 🔑 Criar e validar arquivo de credenciais
         run: |
           echo "${{ secrets.GOOGLE_CREDENTIALS }}" | base64 --decode > credentials/credentials.json
-          chmod 600 credentials/credentials.json  # Garante que o arquivo tenha permissão correta
+          chmod 600 credentials/credentials.json  # Garante que o arquivo tenha a permissão correta
 
-          # Valida se o arquivo foi realmente criado
-          echo "📂 Verificando conteúdo da pasta credentials:"
-          ls -l credentials/  # Lista arquivos da pasta credentials
-          
-          if [ -f credentials/credentials.json ]; then
-            echo "✅ Arquivo credentials.json foi criado com sucesso!"
+          # Verifica se o arquivo foi criado
+          echo "📂 Verificando se credentials.json foi criado corretamente..."
+          ls -l credentials/
+
+          if [ ! -s credentials/credentials.json ]; then
+            echo "❌ ERRO: Arquivo credentials.json NÃO foi criado corretamente ou está vazio!"
+            exit 1
           else
-            echo "❌ ERRO: Arquivo credentials.json NÃO foi criado!"
+            echo "✅ Arquivo credentials.json foi criado com sucesso!"
+          fi
+
+          # Valida o JSON
+          echo "🔍 Validando JSON..."
+          if jq empty credentials/credentials.json; then
+            echo "✅ JSON válido!"
+          else
+            echo "❌ ERRO: O JSON do credentials.json está inválido!"
+            cat credentials/credentials.json
             exit 1
           fi
 
-          # Exibe o conteúdo do arquivo (remova depois de testar)
-          echo "📜 Conteúdo do credentials.json:"
-          cat credentials/credentials.json
-
       - name: 🔍 Listar arquivos no repositório
-        run: ls -R  # Lista recursivamente os arquivos para verificar o caminho correto
+        run: ls -R  # Lista recursivamente os arquivos para verificar se tudo está correto
 
-      - name: 📊 Rodar extração de dados
+      - name: 📊 Rodar extração de dados do Google Sheets
         run: |
           if [ ! -f scripts/extract_sheets.py ]; then
             echo "❌ ERRO: O script extract_sheets.py não foi encontrado!"
             exit 1
           fi
-          cd scripts  # Entra na pasta correta, caso necessário
-          ls -l  # Lista os arquivos dentro da pasta scripts para confirmar a existência do script
+          cd scripts  # Entra na pasta correta
+          ls -l  # Confirma a existência do script
           python extract_sheets.py  # Executa o script
 
-      - name: 📤 Commit dos novos dados (se houver mudanças)
+      - name: 📤 Commit e push dos novos dados (se houver mudanças)
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
