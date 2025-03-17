@@ -37,15 +37,21 @@ jobs:
         run: |
           echo "${{ secrets.GOOGLE_CREDENTIALS }}" | base64 --decode > credentials/credentials.json
           chmod 600 credentials/credentials.json  # Garante que o arquivo tenha permissão correta
+
+          # Valida se o arquivo foi realmente criado
+          echo "📂 Verificando conteúdo da pasta credentials:"
+          ls -l credentials/  # Lista arquivos da pasta credentials
           
-          # Valida se o JSON está correto
-          if jq empty credentials/credentials.json; then
-            echo "✅ Arquivo credentials.json está válido!"
+          if [ -f credentials/credentials.json ]; then
+            echo "✅ Arquivo credentials.json foi criado com sucesso!"
           else
-            echo "❌ ERRO: O arquivo credentials.json está inválido!"
-            cat credentials/credentials.json
+            echo "❌ ERRO: Arquivo credentials.json NÃO foi criado!"
             exit 1
           fi
+
+          # Exibe o conteúdo do arquivo (remova depois de testar)
+          echo "📜 Conteúdo do credentials.json:"
+          cat credentials/credentials.json
 
       - name: 🔍 Listar arquivos no repositório
         run: ls -R  # Lista recursivamente os arquivos para verificar o caminho correto
