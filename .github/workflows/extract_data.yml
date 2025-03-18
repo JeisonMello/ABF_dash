@@ -35,7 +35,7 @@ jobs:
 
       - name: 🔑 Criar e validar arquivo de credenciais
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" | base64 --decode > credentials/credentials.json
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > credentials/credentials.json
           chmod 600 credentials/credentials.json  # Garante que o arquivo tenha a permissão correta
 
           # Verifica se o arquivo foi criado
