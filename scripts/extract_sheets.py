@@ -5,7 +5,9 @@ import pandas as pd
 print("Iniciando extração do Google Sheets...")
 
 # Caminho para o arquivo JSON de credenciais
-SERVICE_ACCOUNT_FILE = "/Users/jeisonmello/Documents/GitHub/ABF_dash/credentials/credentials.json"
+import os
+
+SERVICE_ACCOUNT_FILE = os.path.expanduser("~/Documents/GitHub/ABF_dash/credentials/credentials.json")
 
 # Definir escopos de acesso
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
